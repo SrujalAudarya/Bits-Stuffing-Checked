@@ -1,51 +1,56 @@
-#include<stdio.h>
-#include<conio.h>
+#include <stdio.h>
+#include <string.h>
 
-void main(){
-    int count=0,s,i,consecutiveCount=0;
-    int a[16];
+#define MAX 100
 
-    printf("\n Enter the size of the bit array (between 1 and 16): ");
-    scanf("%d",&s);
-
-    if (s < 1 || s > 16) {
-        printf("Invalid size. Please enter a value between 1 and 16.\n");
-        return;
-    }
-
-    printf("\n Enter the bits (1 or 0) in the array of size %d: ",s);
-    for (int i = 0; i < s; i++)
-    {
-        scanf("%d",&a[i]);
-        if (a[i] != 0 && a[i] != 1) {
-            printf("Invalid input. Please enter 0 or 1.\n");
-            return;
-        }
-        if (a[i] == 1) {
-            consecutiveCount++;
+// Function to perform bit stuffing
+void bitStuffing(char data[], char stuffed[]) {
+    int i, j = 0, count = 0;
+    for (i = 0; data[i] != '\0'; i++) {
+        stuffed[j++] = data[i];
+        if (data[i] == '1') {
+            count++;
+            if (count == 5) {  // After 5 consecutive 1s, insert a 0
+                stuffed[j++] = '0';
+                count = 0;
+            }
         } else {
-            consecutiveCount = 0;
-        }
-        if (consecutiveCount >= 5) {
-            count = 5;
+            count = 0;
         }
     }
-    
-    printf("\nYour entered bit in array is : ");
-    for (int i = 0; i < s; i++){
-        printf("%d",a[i]);
-    }
+    stuffed[j] = '\0';
+}
 
-    if (count == 5) {
-        printf("\nBits are buffered.\n");
-        for (i = 0; i < count; i++) {
-            printf("%d", a[i]);
-        }
-        printf("0");
-    } else {
-        printf("\nBits are not buffered.\n");
-        for (i = 0; i < s; i++) {
-            printf("%d", a[i]);
+// Function to perform bit destuffing
+void bitDestuffing(char stuffed[], char destuffed[]) {
+    int i, j = 0, count = 0;
+    for (i = 0; stuffed[i] != '\0'; i++) {
+        destuffed[j++] = stuffed[i];
+        if (stuffed[i] == '1') {
+            count++;
+            if (count == 5 && stuffed[i + 1] == '0') {  // If 5 ones are found, skip next 0
+                i++; 
+                count = 0;
+            }
+        } else {
+            count = 0;
         }
     }
+    destuffed[j] = '\0';
+}
+
+// Main function
+int main() {
+    char data[MAX], stuffed[MAX], destuffed[MAX];
+
+    printf("Enter binary data: ");
+    scanf("%s", data);
+
+    bitStuffing(data, stuffed);
+    printf("Bit Stuffed Data:   %s\n", stuffed);
+
+    bitDestuffing(stuffed, destuffed);
+    printf("Bit Destuffed Data: %s\n", destuffed);
+
+    return 0;
 }
